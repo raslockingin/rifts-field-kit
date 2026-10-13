@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner() {
+      return signedIn() && request.auth.token.email.lower() in ['raslockingin@gmail.com'];
+    }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // names and pictures shown next to characters
+    match /profiles/{uid} {
+      allow read: if signedIn();
+      allow write: if isSelf(uid);
+    }
+    // each player's characters: everyone at the table can see, only the owner (or site admin) can change
+    match /players/{uid} {
+      allow read: if signedIn();
+      allow write: if isSelf(uid) || isOwner();
+    }
+    match /players/{uid}/{rest=**} {
+      allow read: if signedIn();
+      allow write: if isSelf(uid) || isOwner();
+    }
+    // each G.M.'s campaigns, journal, combat and bestiary
+    match /gms/{uid} {
+      allow read: if signedIn();
+      allow write: if isSelf(uid) || isOwner();
+    }
+    match /gms/{uid}/{rest=**} {
+      allow read: if signedIn();
+      allow write: if isSelf(uid) || isOwner();
+    }
+    // G.M.'s private notes: nobody else can read them
+    match /data/users/{uid}/{rest=**} {
+      allow read, write: if isSelf(uid);
+    }
+    // shared dice log and party notes
+    match /table/{key}/{rest=**} {
+      allow read, write: if signedIn();
+    }
+    match /rolls/{id} {
+      allow read, create: if signedIn();
+      allow update, delete: if isOwner();
+    }
+    // table-wide house rules
+    match /settings/{rest=**} {
+      allow read: if signedIn();
+      allow write: if isOwner();
+    }
+    match /characters/{rest=**} {
+      allow read: if signedIn();
+      allow write: if isOwner();
+    }
+  }
+}
