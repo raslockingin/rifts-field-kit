@@ -993,7 +993,7 @@ applyDamage.info={lethal:false,low:[],broke:[]};
 /* ---------- house rules ---------- */
 const PRESET_RULES=[
  {id:"beatOdds",name:"Beating the Odds",tag:"Book option",text:"When an M.D. hit would kill a character, a medic who reaches them within 2D4 minutes can roll Paramedic, Field Surgery or Medical Doctor. Success: coma with S.D.C. 0 and 1D6+2 Hit Points. A second roll plus 4D6x10 minutes of surgery saves them, but they lose a limb or organs (roll hit location). Not if the shot was a called shot to the head."},
- {id:"roll4d6",name:"Heroic attributes (4D6, drop lowest)",tag:"Homebrew",text:"When rolling a new character's attributes, roll 4D6 for each one and drop the lowest die, keeping the best three. Totals of 16-18 still get the extra 1D6. Characters come out a little tougher and more capable than with the book's 3D6. The roller in Create a Character and the guided builder follow this rule automatically when it's on."},
+ {id:"roll4d6",name:"Heroic attributes (4D6, keep the 3 highest)",tag:"Homebrew",text:"When rolling a new character's attributes, roll 4D6 for each one and keep the 3 highest dice (the lowest die is dropped). Totals of 16-18 still get the extra 1D6. Characters come out a little tougher and more capable than with the book's 3D6. The roller in Create a Character and the guided builder follow this rule automatically when it's on."},
  {id:"armorWarn",name:"Armor warning",tag:"Homebrew",text:"When worn armor drops to 25% of its M.D.C. or less, the app warns the whole table in the log so the player knows it's time to retreat or repair."},
 ];
 const HIT_LOC=[[10,"Lost a foot"],[20,"Lost a hand"],[30,"Lost an entire arm"],[40,"Lost an entire leg"],[50,"Lost both arms"],[60,"Severe body and skin damage, plus one arm or leg (player's choice)"],[70,"Shot clean through: severe shock, 1D4 internal organs must be replaced"],[80,"Shot clean through: lost a lung, heart or 1D4 organs damaged"],[90,"Lost half the face; 20% of the upper body damaged"],[95,"Lost everything below the waist"],[100,"Lost all four limbs, or an arm and a leg on one side"]];
@@ -1435,7 +1435,7 @@ const B_STYLES=[
 const B_STEPS=[
  ["Talk to your G.M.","Ask what kind of campaign it is (military, wilderness, city, monster-hunting), which books are allowed and whether any classes are off-limits.","A Coalition Grunt and a Shifter in the same party can work, but only if everyone knows going in."],
  ["Pick a play style","Choose how you want to spend a session: shooting, fighting up close, casting, psychic powers, solving problems or scouting. The cards below explain each.","This decides which attributes, skills and gear matter, so every later choice gets easier."],
- ["Roll attributes","Roll 3D6 for each of the 8 attributes, in order (or 4D6 dropping the lowest die, if your table uses the Heroic attributes house rule). A roll of 16, 17 or 18 is exceptional: roll another 1D6 and add it (if that's a 6, roll and add once more). Use the roller below. Some G.M.s let you arrange the rolls; ask first.","Bonuses start at 16, and very low scores (7 or less) carry penalties. The sheet works both out for you."],
+ ["Roll attributes","Roll 3D6 for each of the 8 attributes, in order (or 4D6 keeping the 3 highest, if your table uses the Heroic attributes house rule). A roll of 16, 17 or 18 is exceptional: roll another 1D6 and add it (if that's a 6, roll and add once more). Use the roller below. Some G.M.s let you arrange the rolls; ask first.","Bonuses start at 16, and very low scores (7 or less) carry penalties. The sheet works both out for you."],
  ["Choose race and class","Most first characters are human with an O.C.C. (Occupational Character Class). An R.C.C. (Racial Character Class), like a Psi-Stalker or Dragon Hatchling, is your race and your job in one. Check the requirements on the Classes tab.","If your rolls don't meet a class's minimums, you can't take it. Pick the class after rolling, not before."],
  ["Write down H.P., S.D.C. and energy","H.P. = your P.E. score + 1D6. S.D.C. comes from your class and physical skills. Mages get P.P.E. and psychics get I.S.P. from their class description.","H.P. and S.D.C. matter when you're out of armor. In Mega-Damage fights, your armor's M.D.C. is what keeps you alive."],
  ["Pick skills","Your class gives you O.C.C. skills automatically. Then choose O.C.C. Related skills (they get your class bonus) and Secondary skills (base % only). The Skill Library tab shows each skill's % at your level.","Cover the party's gaps. If nobody can drive, heal or read, those are the best picks you can make."],
@@ -1452,7 +1452,7 @@ function bRoll(){const d=()=>1+Math.floor(Math.random()*6);
     if(t>=16){let e=d();t+=e;x+=" +"+e;if(e===6){const e2=d();t+=e2;x+="+"+e2}}
     out[k]=t;det.push(`${l} ${r.join(",")}${x}=${t}`)}
   S.bRolled=out;
-  try{logRoll({char:"",label:four?"Attributes (4D6 drop lowest)":"Attributes (3D6 each)",detail:det.join(" · "),total:Object.values(out).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
+  try{logRoll({char:"",label:four?"Attributes (4D6 keep 3 highest)":"Attributes (3D6 each)",detail:det.join(" · "),total:Object.values(out).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
   renderMain()}
 function bUse(){const r=S.bRolled;if(!r)return;const c=blankChar("New character");c.attrs={...r};
   const hp=r.PE+1+Math.floor(Math.random()*6);c.hp={cur:hp,max:hp};
@@ -1493,7 +1493,7 @@ function buildView(){
 }
 function bRollerView(){const r=S.bRolled;
   return `<div class="training" style="margin-top:8px"><div class="tr-row"><button class="btn pri sm" data-act="b-roll">${r?"Roll again":"Roll my attributes"}</button>
-    ${r?`<button class="btn sm" data-act="b-use">Start a sheet with these</button>`:""}<span class="small muted">${ruleOn("roll4d6")?"House rule: 4D6, drop the lowest. ":""}Rolls show in the dice log so the table can see them.</span></div>
+    ${r?`<button class="btn sm" data-act="b-use">Start a sheet with these</button>`:""}<span class="small muted">${ruleOn("roll4d6")?"House rule: 4D6, keep the 3 highest. ":""}Rolls show in the dice log so the table can see them.</span></div>
     ${r?`<div class="st-stats num" style="font-size:14px;gap:6px 16px">${B_ATTRS.map(([k,l])=>`<span><b style="color:${r[k]>=16?"var(--good)":r[k]<=7?"var(--bad)":"var(--ink)"}">${l} ${r[k]}</b></span>`).join("")}</div>`:""}</div>`}
 function bStyleCard(s,r,lab){
   const idx=c=>CLASSES.findIndex(k=>k.n===c);
@@ -1538,7 +1538,7 @@ function wRollAttr(){const d=()=>1+Math.floor(Math.random()*6);
   return {t,dice,drop,extra}}
 function wDetail(r){return `${r.dice.join(",")}${r.drop!=null?` (drop ${r.drop})`:""}${r.extra.length?` +${r.extra.join("+")}`:""}`}
 function wRollAll(){const w=S.wiz;const rolls={},attrs={};for(const k of W_ATTR_KEYS){rolls[k]=wRollAttr();attrs[k]=rolls[k].t}
-  w.rolls=rolls;w.attrs=attrs;w.method=wRule4d6()?"4D6 drop lowest":"3D6";
+  w.rolls=rolls;w.attrs=attrs;w.method=wRule4d6()?"4D6 keep 3 highest":"3D6";
   try{logRoll({char:w.name||"",label:`Attributes (${w.method})`,detail:W_ATTR_KEYS.map(k=>`${W_ABBR[k]} ${wDetail(rolls[k])}=${attrs[k]}`).join(" · "),total:Object.values(attrs).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
   if(w.cls!=null&&wReq(CLASSES[w.cls]).fails.length) w.cls=null;
   wSave();renderMain()}
@@ -1588,7 +1588,7 @@ function wConcept(){const w=S.wiz;
 function wAttrs(){const w=S.wiz,a=w.attrs,st=wStyle();
   const key=st?st.stats.map(x=>x[0]):[];
   return `<h3 class="wiz-h">Roll your attributes</h3>
-  <p class="wiz-p">Each attribute is rolled with <b>${wRule4d6()?"4D6, dropping the lowest die":"3D6"}</b>${wRule4d6()?' (your table\'s <b>Heroic attributes</b> house rule)':""}. A total of 16, 17 or 18 is exceptional and adds another 1D6 (and once more on a 6). Rolls are shared in the dice log.</p>
+  <p class="wiz-p">Each attribute is rolled with <b>${wRule4d6()?"4D6 and keeping the 3 highest dice":"3D6"}</b>${wRule4d6()?' (your table\'s <b>Heroic attributes</b> house rule)':""}. A total of 16, 17 or 18 is exceptional and adds another 1D6 (and once more on a 6). Rolls are shared in the dice log.</p>
   <div class="row"><button class="btn pri" data-act="wz-roll">${a?"Roll all again":"Roll all 8 attributes"}</button>${a?`<span class="small muted">Rolled with ${esc(w.method||"manual entry")}. Ask your G.M. before rerolling.</span>`:""}</div>
   <div class="attrs" style="margin-top:12px">${W_ATTR_KEYS.map(k=>{const v=a?a[k]:"";const r=w.rolls?.[k];
     return `<div class="attr ${key.includes(k)?"wiz-key":""}"><span class="lab">${W_ABBR[k]}${key.includes(k)?" ★":""}</span><input type="number" min="1" max="40" data-wk="attrs.${k}" value="${v}" aria-label="${W_ABBR[k]}"><span class="eff">${a?attrBonus(k,v):""}${r?`<br><span class="num">${esc(wDetail(r))}</span>`:(w.edited||[]).includes(k)?`<br><span class="small" style="color:var(--md)">edited by hand</span>`:""}</span></div>`}).join("")}</div>
