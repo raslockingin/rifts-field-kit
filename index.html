@@ -351,6 +351,32 @@ input.camp-title{border:1px dashed var(--line);background:transparent;padding:2p
 .veh h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 .locs td.n,.vw td.n{width:72px}
 @media (max-width:640px){.b-attrs .b-who{display:none}}
+/* guided builder */
+.wiz-steps{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.wiz-step{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--edge);background:var(--plate2);color:var(--muted);font-family:var(--f-display);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;cursor:pointer;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.wiz-step .num{color:var(--accent)}
+.wiz-step.done{color:var(--ink)}
+.wiz-step.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.wiz-step.on .num{color:var(--on-accent)}
+.wiz-body{min-height:200px}
+.wiz-h{font-size:16px;margin:14px 0 8px}
+.wiz-body>.wiz-h:first-child{margin-top:0}
+.wiz-p{margin:0 0 10px;max-width:72ch}
+.wiz-foot{display:flex;justify-content:space-between;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.wiz-pick{text-align:left;cursor:pointer;color:var(--ink);font:inherit}
+.wiz-pick:hover{border-color:var(--accent)}
+.wiz-pick.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent),var(--glow);background:var(--accent-soft)}
+.wiz-pick.wiz-no{opacity:.55;cursor:not-allowed}
+.attr.wiz-key{border-color:var(--accent)}
+.wiz-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:900px){.wiz-cols{grid-template-columns:minmax(0,1fr)}}
+.wiz-list{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow-y:auto;padding-right:4px}
+.wiz-sk{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--edge2);background:var(--field);padding:6px 8px}
+.wiz-sk.have{opacity:.6}
+.wiz-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.wiz-sum>div{border:1px solid var(--edge2);background:var(--field);padding:8px 10px}
+.wiz-sum p{margin:4px 0 0}
+@media (max-width:640px){.wiz-sk{flex-direction:column;align-items:flex-start}}
 /* welcome */
 .w-hero{position:relative;overflow:hidden;min-height:260px;display:flex;align-items:center;padding:28px 24px}
 .w-lines{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
@@ -603,7 +629,7 @@ const CLASSES=[
  {n:"Merc Soldier",g:"Men at Arms",k:"O.C.C.",lvl:1,p:81,req:"None (some specialties have minimums)",st:"merc",
   d:"A professional soldier for hire with a military specialty, from grunt to medic to heavy weapons. Mercenary companies are everywhere on Rifts Earth, protecting towns, hunting monsters and fighting other people's wars for pay."},
  {n:"Robot Pilot",g:"Men at Arms",k:"O.C.C.",lvl:3,p:83,req:"P.S. 10, P.P. 12, P.E. 12",st:null,
-  d:"Trained to drive giant combat robots and power armor. Robot pilots crew the war machines of armies and mercenary companies. Note: this app doesn't track vehicles yet."},
+  d:"Trained to drive giant combat robots and power armor. Robot pilots crew the war machines of armies and mercenary companies. Track your robot or power armor on the Gear & Armor tab."},
  {n:"Body Fixer",g:"Adventurers & Scholars",k:"O.C.C.",lvl:1,p:86,req:"I.Q. 10",st:null,
   d:"A doctor of the wastelands who treats humans and D-Bees alike, often for free. In a world with few hospitals, a Body Fixer is welcome in almost any town and invaluable to any adventuring group."},
  {n:"City Rat",g:"Adventurers & Scholars",k:"O.C.C.",lvl:2,p:88,req:"None (some specialties have minimums)",st:null,
@@ -645,7 +671,7 @@ const CLASSES=[
  {n:"Coalition Grunt",g:"Coalition States",k:"O.C.C.",lvl:1,p:231,req:"No physical attribute under 7; human or Psi-Stalker",st:null,
   d:"A soldier of the Coalition States, the human-supremacist empire that fights magic, D-Bees and anything it calls inhuman. Well-armed in Dead Boy armor and disciplined, but hard to fit into a group of mages and nonhumans."},
  {n:"SAMAS Pilot",g:"Coalition States",k:"O.C.C.",lvl:3,p:233,req:"I.Q. 10, P.P. 10; human",st:null,
-  d:"An elite Coalition pilot of the SAMAS flying power armor, the 'Death's Head' of the skies. Note: this app doesn't track power armor yet."},
+  d:"An elite Coalition pilot of the SAMAS flying power armor, the 'Death's Head' of the skies. Track your SAMAS on the Gear & Armor tab."},
  {n:"Military Specialist",g:"Coalition States",k:"O.C.C.",lvl:3,p:236,req:"I.Q. 12, M.E. 12, P.E. 10; human",st:null,
   d:"A Coalition special forces operative trained in espionage, infiltration and commando missions behind enemy lines."},
  {n:"Technical Officer",g:"Coalition States",k:"O.C.C.",lvl:2,p:237,req:"I.Q. 9",st:null,
@@ -967,6 +993,7 @@ applyDamage.info={lethal:false,low:[],broke:[]};
 /* ---------- house rules ---------- */
 const PRESET_RULES=[
  {id:"beatOdds",name:"Beating the Odds",tag:"Book option",text:"When an M.D. hit would kill a character, a medic who reaches them within 2D4 minutes can roll Paramedic, Field Surgery or Medical Doctor. Success: coma with S.D.C. 0 and 1D6+2 Hit Points. A second roll plus 4D6x10 minutes of surgery saves them, but they lose a limb or organs (roll hit location). Not if the shot was a called shot to the head."},
+ {id:"roll4d6",name:"Heroic attributes (4D6, drop lowest)",tag:"Homebrew",text:"When rolling a new character's attributes, roll 4D6 for each one and drop the lowest die, keeping the best three. Totals of 16-18 still get the extra 1D6. Characters come out a little tougher and more capable than with the book's 3D6. The roller in Create a Character and the guided builder follow this rule automatically when it's on."},
  {id:"armorWarn",name:"Armor warning",tag:"Homebrew",text:"When worn armor drops to 25% of its M.D.C. or less, the app warns the whole table in the log so the player knows it's time to retreat or repair."},
 ];
 const HIT_LOC=[[10,"Lost a foot"],[20,"Lost a hand"],[30,"Lost an entire arm"],[40,"Lost an entire leg"],[50,"Lost both arms"],[60,"Severe body and skin damage, plus one arm or leg (player's choice)"],[70,"Shot clean through: severe shock, 1D4 internal organs must be replaced"],[80,"Shot clean through: lost a lung, heart or 1D4 organs damaged"],[90,"Lost half the face; 20% of the upper body damaged"],[95,"Lost everything below the waist"],[100,"Lost all four limbs, or an arm and a leg on one side"]];
@@ -1408,7 +1435,7 @@ const B_STYLES=[
 const B_STEPS=[
  ["Talk to your G.M.","Ask what kind of campaign it is (military, wilderness, city, monster-hunting), which books are allowed and whether any classes are off-limits.","A Coalition Grunt and a Shifter in the same party can work, but only if everyone knows going in."],
  ["Pick a play style","Choose how you want to spend a session: shooting, fighting up close, casting, psychic powers, solving problems or scouting. The cards below explain each.","This decides which attributes, skills and gear matter, so every later choice gets easier."],
- ["Roll attributes","Roll 3D6 for each of the 8 attributes, in order. A roll of 16, 17 or 18 is exceptional: roll another 1D6 and add it (if that's a 6, roll and add once more). Use the roller below. Some G.M.s let you arrange the rolls; ask first.","Bonuses start at 16, and very low scores (7 or less) carry penalties. The sheet works both out for you."],
+ ["Roll attributes","Roll 3D6 for each of the 8 attributes, in order (or 4D6 dropping the lowest die, if your table uses the Heroic attributes house rule). A roll of 16, 17 or 18 is exceptional: roll another 1D6 and add it (if that's a 6, roll and add once more). Use the roller below. Some G.M.s let you arrange the rolls; ask first.","Bonuses start at 16, and very low scores (7 or less) carry penalties. The sheet works both out for you."],
  ["Choose race and class","Most first characters are human with an O.C.C. (Occupational Character Class). An R.C.C. (Racial Character Class), like a Psi-Stalker or Dragon Hatchling, is your race and your job in one. Check the requirements on the Classes tab.","If your rolls don't meet a class's minimums, you can't take it. Pick the class after rolling, not before."],
  ["Write down H.P., S.D.C. and energy","H.P. = your P.E. score + 1D6. S.D.C. comes from your class and physical skills. Mages get P.P.E. and psychics get I.S.P. from their class description.","H.P. and S.D.C. matter when you're out of armor. In Mega-Damage fights, your armor's M.D.C. is what keeps you alive."],
  ["Pick skills","Your class gives you O.C.C. skills automatically. Then choose O.C.C. Related skills (they get your class bonus) and Secondary skills (base % only). The Skill Library tab shows each skill's % at your level.","Cover the party's gaps. If nobody can drive, heal or read, those are the best picks you can make."],
@@ -1418,11 +1445,14 @@ const B_STEPS=[
  ["Final check","Can you say how many attacks you have, your best strike bonus, your armor's M.D.C., what you do in a fight and what you do outside one? Then you're ready.","Knowing these five things keeps your turns fast and fun at the table."],
 ];
 function bRoll(){const d=()=>1+Math.floor(Math.random()*6);
-  const out={},det=[];for(const [k,l] of B_ATTRS){let r=[d(),d(),d()],t=r[0]+r[1]+r[2],x="";
-    if(t>=16){let e=d();t+=e;x="+"+e;if(e===6){const e2=d();t+=e2;x+="+"+e2}}
-    out[k]=t;det.push(`${l} ${r.join("+")}${x}=${t}`)}
+  const four=ruleOn("roll4d6");
+  const out={},det=[];for(const [k,l] of B_ATTRS){let r=four?[d(),d(),d(),d()]:[d(),d(),d()],x="";
+    let kept=[...r];if(four){kept.splice(kept.indexOf(Math.min(...kept)),1);x=" drop "+Math.min(...r)}
+    let t=kept.reduce((a,b)=>a+b,0);
+    if(t>=16){let e=d();t+=e;x+=" +"+e;if(e===6){const e2=d();t+=e2;x+="+"+e2}}
+    out[k]=t;det.push(`${l} ${r.join(",")}${x}=${t}`)}
   S.bRolled=out;
-  try{logRoll({char:"",label:"Attributes (3D6 each)",detail:det.join(" · "),total:Object.values(out).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
+  try{logRoll({char:"",label:four?"Attributes (4D6 drop lowest)":"Attributes (3D6 each)",detail:det.join(" · "),total:Object.values(out).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
   renderMain()}
 function bUse(){const r=S.bRolled;if(!r)return;const c=blankChar("New character");c.attrs={...r};
   const hp=r.PE+1+Math.floor(Math.random()*6);c.hp={cur:hp,max:hp};
@@ -1436,6 +1466,7 @@ function buildView(){
   return `<div class="stack">
   <section class="panel gsec"><h2>Create a character</h2>
     <p class="w-p" style="margin-top:0">A step-by-step path to a level 1 character, with the reason behind each choice. If you want to start playing tonight, a <button class="linkbtn" data-act="picker">ready-made starter</button> is faster. Use this guide when you want to build your own.</p>
+    <div class="ask" style="flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px"><div><b style="font-size:15px">Guided builder</b><br><span>Walks you through every step on screen, checks class requirements against your rolls, and creates the finished sheet.</span></div><button class="btn pri" data-act="wz-start">${wLoad()?"Continue my build":"Start the guided builder"}</button></div>
     <ol class="steps big">${B_STEPS.map(([t,h,w],i)=>`<li><b>${esc(t)}${t.endsWith(".")?"":"."}</b> ${esc(h)}<div class="small muted" style="margin-top:2px"><span class="lab" style="color:var(--accent)">Why</span> ${esc(w)}</div>${i===2?bRollerView():""}</li>`).join("")}</ol>
   </section>
   <section class="panel gsec"><h2>What each attribute does</h2>
@@ -1462,7 +1493,7 @@ function buildView(){
 }
 function bRollerView(){const r=S.bRolled;
   return `<div class="training" style="margin-top:8px"><div class="tr-row"><button class="btn pri sm" data-act="b-roll">${r?"Roll again":"Roll my attributes"}</button>
-    ${r?`<button class="btn sm" data-act="b-use">Start a sheet with these</button>`:""}<span class="small muted">Rolls show in the dice log so the table can see them.</span></div>
+    ${r?`<button class="btn sm" data-act="b-use">Start a sheet with these</button>`:""}<span class="small muted">${ruleOn("roll4d6")?"House rule: 4D6, drop the lowest. ":""}Rolls show in the dice log so the table can see them.</span></div>
     ${r?`<div class="st-stats num" style="font-size:14px;gap:6px 16px">${B_ATTRS.map(([k,l])=>`<span><b style="color:${r[k]>=16?"var(--good)":r[k]<=7?"var(--bad)":"var(--ink)"}">${l} ${r[k]}</b></span>`).join("")}</div>`:""}</div>`}
 function bStyleCard(s,r,lab){
   const idx=c=>CLASSES.findIndex(k=>k.n===c);
@@ -1479,6 +1510,232 @@ function bStyleCard(s,r,lab){
     <p class="callout no"><b>Beginner trap:</b> ${esc(s.trap)}</p>
   </article>`;
 }
+
+/* ---------- guided builder: step-by-step level 1 character ---------- */
+const W_STEPS=["Concept","Attributes","Race & class","Vitals","Skills","Combat training","Gear","Story","Review"];
+const W_ALIGN=[
+ ["Principled","Good","Honest, lawful, always helps. Never lies or betrays."],
+ ["Scrupulous","Good","Good-hearted and loyal, but will bend rules and lie for a good cause. Easy for new players."],
+ ["Unprincipled","Selfish","Looks out for themselves but has a conscience. A 'good rogue.' Easy for new players."],
+ ["Anarchist","Selfish","Does what they want. Might help, might not. Unpredictable."],
+ ["Miscreant","Evil","Selfish and cruel when it pays. Hard to play in a heroic group."],
+ ["Aberrant","Evil","Evil but with a personal code of honor."],
+ ["Diabolic","Evil","Truly vicious. Not recommended for player characters."],
+];
+const W_ATTR_KEYS=["IQ","ME","MA","PS","PP","PE","PB","Spd"];
+const W_ABBR={IQ:"I.Q.",ME:"M.E.",MA:"M.A.",PS:"P.S.",PP:"P.P.",PE:"P.E.",PB:"P.B.",Spd:"Spd"};
+function wNew(){return {step:0,name:"",player:"",style:"",attrs:null,rolls:null,method:"",
+  cls:null,race:"Human",hp:0,hpRoll:"",sdc:0,ppe:0,isp:0,skills:[],h2h:"basic",wps:[],
+  armor:{name:"",mdc:0},weapon:{name:"",dmg:"",type:"MD",wp:""},credits:0,alignment:"",why:"",want:"",fear:"",q:"",cat:""}}
+function wSave(){try{localStorage.setItem("rft.wiz",JSON.stringify(S.wiz))}catch(e){}}
+function wLoad(){try{const v=JSON.parse(localStorage.getItem("rft.wiz")||"null");if(v&&typeof v==="object")return {...wNew(),...v}}catch(e){}return null}
+const wRule4d6=()=>ruleOn("roll4d6");
+function wRollAttr(){const d=()=>1+Math.floor(Math.random()*6);
+  let dice=wRule4d6()?[d(),d(),d(),d()]:[d(),d(),d()],kept=[...dice],drop=null;
+  if(dice.length===4){const lo=Math.min(...dice);const i=kept.indexOf(lo);drop=kept.splice(i,1)[0]}
+  let t=kept.reduce((a,b)=>a+b,0),extra=[];
+  if(t>=16){let e=d();extra.push(e);t+=e;if(e===6){const e2=d();extra.push(e2);t+=e2}}
+  return {t,dice,drop,extra}}
+function wDetail(r){return `${r.dice.join(",")}${r.drop!=null?` (drop ${r.drop})`:""}${r.extra.length?` +${r.extra.join("+")}`:""}`}
+function wRollAll(){const w=S.wiz;const rolls={},attrs={};for(const k of W_ATTR_KEYS){rolls[k]=wRollAttr();attrs[k]=rolls[k].t}
+  w.rolls=rolls;w.attrs=attrs;w.method=wRule4d6()?"4D6 drop lowest":"3D6";
+  try{logRoll({char:w.name||"",label:`Attributes (${w.method})`,detail:W_ATTR_KEYS.map(k=>`${W_ABBR[k]} ${wDetail(rolls[k])}=${attrs[k]}`).join(" · "),total:Object.values(attrs).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
+  if(w.cls!=null&&wReq(CLASSES[w.cls]).fails.length) w.cls=null;
+  wSave();renderMain()}
+function wReq(k){
+  const a=S.wiz.attrs||{},fails=[],notes=[];if(!k)return {fails,notes};
+  const r=k.req.replace(/\([^)]*\)/g,"");
+  const map={"I.Q.":"IQ","M.E.":"ME","M.A.":"MA","P.S.":"PS","P.P.":"PP","P.E.":"PE","P.B.":"PB"};
+  for(const m of r.matchAll(/(I\.Q\.|M\.E\.|M\.A\.|P\.S\.|P\.P\.|P\.E\.|P\.B\.)\s*(\d+)/g)){const key=map[m[1]],n=+m[2];if(S.wiz.attrs&&(+a[key]||0)<n)fails.push(`${m[1]} ${n}+ (you have ${a[key]})`)}
+  const pm=r.match(/No physical attribute under (\d+)/i);
+  if(pm&&S.wiz.attrs)for(const key of ["PS","PP","PE","PB","Spd"])if((+a[key]||0)<+pm[1])fails.push(`${W_ABBR[key]} at least ${pm[1]} (you have ${a[key]})`);
+  if(/human/i.test(r)&&!/Psi-Stalker/.test(r))notes.push("Human only");
+  if(/human or Psi-Stalker/i.test(r))notes.push("Human or Psi-Stalker only");
+  return {fails,notes}}
+function wStyle(){return B_STYLES.find(s=>s.id===S.wiz.style)||null}
+function wIssues(){const w=S.wiz,out=[];const k=CLASSES[w.cls];
+  if(!w.name.trim())out.push(["warn","Your character has no name yet.",0]);
+  if(!w.attrs)out.push(["no","Attributes haven't been rolled.",1]);
+  if(w.cls==null)out.push(["no","No class chosen.",2]);
+  else if(wReq(k).fails.length)out.push(["no",`Your attributes don't meet the ${k.n} requirements.`,2]);
+  if(!(+w.hp>0))out.push(["warn","Hit Points are 0. Roll them on the Vitals step.",3]);
+  const occ=w.skills.filter(s=>s.src==="O.C.C.").length;
+  if(!w.skills.length)out.push(["warn","No skills yet. Every class starts with several.",4]);
+  else if(!w.skills.some(s=>!["Physical","Weapon Proficiency (Ancient)","Weapon Proficiency (Modern)","Military"].includes(s.cat)))out.push(["warn","All your skills are combat-related. Add at least one that helps outside a fight.",4]);
+  if(!(+w.armor.mdc>0)&&!(k&&/Dragon|Cyborg/.test(k.n)))out.push(["warn","No M.D.C. armor. One Mega-Damage hit can kill an unarmored character.",6]);
+  if(w.weapon.name&&w.weapon.wp&&!w.wps.includes(w.weapon.wp))out.push(["warn",`Your ${w.weapon.name} uses W.P. ${w.weapon.wp}, which you don't have. You'll get no strike bonus with it.`,5]);
+  if(!w.alignment)out.push(["warn","No alignment picked.",7]);
+  return out}
+function wizardView(){
+  const w=S.wiz, st=w.step;
+  const nav=`<nav class="wiz-steps" aria-label="Builder steps">${W_STEPS.map((n,i)=>`<button class="wiz-step ${i===st?"on":""} ${i<st?"done":""}" data-act="wz-go" data-v="${i}"><span class="num">${i+1}</span>${esc(n)}</button>`).join("")}</nav>`;
+  const body=[wConcept,wAttrs,wClass,wVitals,wSkills,wTraining,wGear,wStory,wReview][st]();
+  const back=st>0?`<button class="btn" data-act="wz-go" data-v="${st-1}">Back</button>`:`<span></span>`;
+  const next=st<W_STEPS.length-1?`<button class="btn pri" data-act="wz-go" data-v="${st+1}">Next: ${esc(W_STEPS[st+1])}</button>`:"";
+  return `<section class="panel wiz"><div class="sec-head"><h2 style="color:var(--ink);font-size:22px">Guided builder</h2>
+      <div class="row"><span class="small muted">Your progress saves on this device.</span><button class="btn sm ghost" data-act="wz-exit">Close</button><button class="btn sm ghost danger" data-act="wz-reset">Start over</button></div></div>
+    ${nav}<div class="wiz-body">${body}</div><div class="wiz-foot">${back}${next}</div></section>`;
+}
+const wIn=(k,v,attrs="")=>`<input data-wk="${k}" value="${esc(v??"")}" ${attrs}>`;
+function wTip(t){return `<p class="callout" style="margin-top:12px">${t}</p>`}
+function wConcept(){const w=S.wiz;
+  return `<h3 class="wiz-h">Who are you playing?</h3>
+  <div class="row" style="max-width:640px"><label class="f" style="flex:2"><span class="lab">Character name</span>${wIn("name",w.name,'placeholder="e.g. Ryn Calder" maxlength="60"')}</label>
+  <label class="f" style="flex:1"><span class="lab">Player</span>${wIn("player",w.player,'placeholder="Your name" maxlength="40"')}</label></div>
+  <h3 class="wiz-h">How do you want to play? <span class="small muted">(optional, helps the builder suggest classes)</span></h3>
+  <div class="cls-grid">${B_STYLES.map(s=>`<button class="cls wiz-pick ${w.style===s.id?"sel":""}" data-act="wz-set" data-k="style" data-v="${w.style===s.id?"":s.id}" aria-pressed="${w.style===s.id}"><div class="cls-top"><h4>${esc(s.n)}</h4></div><span class="lvl ${s.lv}">${s.tag}</span><p>${esc(s.d)}</p></button>`).join("")}</div>
+  ${wTip("Not sure? <b>Soldier</b> and <b>Problem Solver</b> are the easiest to learn. You can change your mind on any step.")}`}
+function wAttrs(){const w=S.wiz,a=w.attrs,st=wStyle();
+  const key=st?st.stats.map(x=>x[0]):[];
+  return `<h3 class="wiz-h">Roll your attributes</h3>
+  <p class="wiz-p">Each attribute is rolled with <b>${wRule4d6()?"4D6, dropping the lowest die":"3D6"}</b>${wRule4d6()?' (your table\'s <b>Heroic attributes</b> house rule)':""}. A total of 16, 17 or 18 is exceptional and adds another 1D6 (and once more on a 6). Rolls are shared in the dice log.</p>
+  <div class="row"><button class="btn pri" data-act="wz-roll">${a?"Roll all again":"Roll all 8 attributes"}</button>${a?`<span class="small muted">Rolled with ${esc(w.method||"manual entry")}. Ask your G.M. before rerolling.</span>`:""}</div>
+  <div class="attrs" style="margin-top:12px">${W_ATTR_KEYS.map(k=>{const v=a?a[k]:"";const r=w.rolls?.[k];
+    return `<div class="attr ${key.includes(k)?"wiz-key":""}"><span class="lab">${W_ABBR[k]}${key.includes(k)?" ★":""}</span><input type="number" min="1" max="40" data-wk="attrs.${k}" value="${v}" aria-label="${W_ABBR[k]}"><span class="eff">${a?attrBonus(k,v):""}${r?`<br><span class="num">${esc(wDetail(r))}</span>`:(w.edited||[]).includes(k)?`<br><span class="small" style="color:var(--md)">edited by hand</span>`:""}</span></div>`}).join("")}</div>
+  ${st?wTip(`★ marks what a <b>${esc(st.n)}</b> cares about most: ${st.stats.map(([k,why])=>`<b>${W_ABBR[k]}</b> (${esc(why.toLowerCase())})`).join(", ")}.`):""}
+  ${wTip("Already rolled at the table with real dice? Just type your numbers into the boxes. The builder treats them the same way.")}`}
+function wClass(){const w=S.wiz,st=wStyle();
+  if(!w.attrs)return `<p class="wiz-p">Roll your attributes first: some classes need minimum scores.</p><button class="btn pri" data-act="wz-go" data-v="1">Go to Attributes</button>`;
+  const groups=CLS_GROUPS.map(g=>{const list=CLASSES.map((k,i)=>({k,i})).filter(x=>x.k.g===g);
+    return `<h3 class="cls-group">${esc(g)}</h3><div class="cls-grid">${list.map(({k,i})=>{const r=wReq(k),ok=!r.fails.length,rec=st&&st.cls.includes(k.n);
+      return `<button class="cls wiz-pick ${w.cls===i?"sel":""} ${ok?"":"wiz-no"}" data-act="wz-cls" data-i="${i}" aria-pressed="${w.cls===i}" ${ok?"":'aria-disabled="true"'}>
+        <div class="cls-top"><h4>${esc(k.n)}</h4><span class="kind">${esc(k.k)}</span></div>
+        <div class="row" style="gap:6px"><span class="lvl ${k.lvl===1?"easy":k.lvl===2?"mid":"hard"}">${k.lvl===1?"Easy":k.lvl===2?"Medium":"Hard"}</span>${rec?`<span class="lvl easy">Fits your style</span>`:""}</div>
+        <p>${esc(k.d)}</p>
+        <p class="small" style="color:${ok?"var(--good)":"var(--bad)"}">${ok?"✓ You qualify":"✕ Needs "+esc(r.fails.join(", "))}${r.notes.length?` <span class="muted">· ${esc(r.notes.join(", "))}</span>`:""}</p></button>`}).join("")}</div>`}).join("");
+  const k=CLASSES[w.cls];
+  return `<h3 class="wiz-h">Choose your class</h3>
+  <p class="wiz-p">Classes you qualify for are bright; the rest show which score falls short. ${st?`Classes marked <b>Fits your style</b> match ${esc(st.n)}.`:""}</p>
+  ${k&&k.k==="O.C.C."?`<label class="f" style="max-width:320px;margin-bottom:10px"><span class="lab">Race</span>${wIn("race",w.race,'placeholder="Human"')}<span class="small muted">Most O.C.C. characters are human. A D-Bee race may change your attributes; check with your G.M.</span></label>`:""}
+  ${groups}`}
+function wVitals(){const w=S.wiz,k=CLASSES[w.cls],a=w.attrs||{};
+  const magic=k&&k.g==="Practitioners of Magic",psy=k&&(k.g==="Psychics"||/Cyber-Knight/.test(k.n));
+  return `<h3 class="wiz-h">Hit Points, S.D.C. and energy</h3>
+  <div class="pools" style="max-width:760px">
+    <div class="pool hp"><span class="lab">Hit Points</span><div class="row" style="gap:6px"><input type="number" data-wk="hp" value="${+w.hp||""}" style="width:80px"><button class="btn sm" data-act="wz-hp" ${a.PE?"":"disabled"}>Roll P.E. + 1D6</button></div><span class="small muted">${w.hpRoll?esc(w.hpRoll):`P.E. ${a.PE??"?"} + 1D6`}</span></div>
+    <div class="pool sdc"><span class="lab">S.D.C.</span><input type="number" data-wk="sdc" value="${+w.sdc||""}" style="width:80px"><span class="small muted">From your class${k?` (around p. ${k.p})`:""}, plus physical skills</span></div>
+    <div class="pool"><span class="lab">P.P.E.</span><input type="number" data-wk="ppe" value="${+w.ppe||""}" style="width:80px"><span class="small muted">${magic?"Big for mages: class dice + your P.E.":"Small for most non-mages"}</span></div>
+    <div class="pool"><span class="lab">I.S.P.</span><input type="number" data-wk="isp" value="${+w.isp||""}" style="width:80px"><span class="small muted">${psy?"Psychics: based on M.E. plus class dice":"0 unless you have psionics"}</span></div>
+  </div>
+  ${wTip(`<b>Why it matters:</b> H.P. and S.D.C. keep you alive when you're <i>out</i> of armor. In Mega-Damage fights your armor's M.D.C. is what takes the hits, so don't panic if these numbers look small.${k?` Look up the exact S.D.C., P.P.E. and I.S.P. dice on your class's page in the Ultimate Edition (around p. ${k.p}).`:""}`)}`}
+function wSkills(){const w=S.wiz,k=CLASSES[w.cls];
+  const iq=B.iqSkill(w.attrs?.IQ||0);
+  const cats=[...new Set(SKILL_LIB.map(r=>r[0]).filter(c=>!c.startsWith("Weapon Proficiency")))];
+  const q=(w.q||"").toLowerCase();
+  const have=new Set(w.skills.map(s=>s.name));
+  const list=SKILL_LIB.map((r,i)=>({r,i})).filter(({r})=>!r[0].startsWith("Weapon Proficiency")&&(!w.cat||r[0]===w.cat)&&(!q||r[1].toLowerCase().includes(q)||r[4].toLowerCase().includes(q))).slice(0,60);
+  const pct=s=>Math.min(98,(+s.base||0)+iq+(+s.bonus||0));
+  const count=t=>w.skills.filter(s=>s.src===t).length;
+  return `<h3 class="wiz-h">Choose skills</h3>
+  <p class="wiz-p">Your class page${k?` (around p. ${k.p})`:""} lists three kinds: <b>O.C.C. skills</b> you get automatically, a number of <b>Related</b> picks, and a number of <b>Secondary</b> picks. Add each one here and type in any class bonus %. ${iq?`Your I.Q. adds <b>+${iq}%</b> to every skill.`:""}</p>
+  <div class="wiz-cols">
+    <div><div class="row" style="gap:6px;margin-bottom:8px"><label class="f" style="flex:2"><span class="lab">Search</span><input id="w-q" value="${esc(w.q||"")}" placeholder="e.g. pilot, medical, climb"></label>
+      <label class="f" style="flex:1"><span class="lab">Category</span><select id="w-cat"><option value="">All</option>${cats.map(c=>`<option ${w.cat===c?"selected":""}>${esc(c)}</option>`).join("")}</select></label></div>
+      <div class="wiz-list">${list.map(({r,i})=>`<div class="wiz-sk ${have.has(r[1])?"have":""}"><div><b>${esc(r[1])}</b> <span class="small muted">${esc(r[0])} · ${r[2]}%</span><div class="small muted">${esc(r[4])}</div></div>
+        ${have.has(r[1])?`<span class="small" style="color:var(--good)">Added</span>`:`<div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm" data-act="wz-sk" data-i="${i}" data-v="O.C.C.">O.C.C.</button><button class="btn sm" data-act="wz-sk" data-i="${i}" data-v="Related">Related</button><button class="btn sm ghost" data-act="wz-sk" data-i="${i}" data-v="Secondary">Secondary</button></div>`}</div>`).join("")||`<p class="small muted">No skills match.</p>`}</div></div>
+    <div><h3 class="wiz-h" style="margin-top:0">Your skills <span class="small muted">${count("O.C.C.")} O.C.C. · ${count("Related")} Related · ${count("Secondary")} Secondary</span></h3>
+      ${w.skills.length?`<table><thead><tr><th>Skill</th><th>Type</th><th>Bonus %</th><th>L1 %</th><th></th></tr></thead><tbody>${w.skills.map((s,i)=>`<tr><td>${esc(s.name)}</td><td class="small">${esc(s.src)}</td><td class="n"><input type="number" data-wk="skills.${i}.bonus" value="${+s.bonus||0}" ${s.src==="Secondary"?'title="Secondary skills usually get no class bonus"':""}></td><td class="pct">${pct(s)}%</td><td><button class="btn sm ghost danger" data-act="wz-sk-rm" data-i="${i}" aria-label="Remove ${esc(s.name)}">✕</button></td></tr>`).join("")}</tbody></table>`:`<p class="small muted">Nothing added yet.</p>`}
+      ${wTip("<b>Pick to fill gaps.</b> If nobody in the group can drive, heal, fix things or read, those skills will get used every session.")}</div>
+  </div>`}
+function wTraining(){const w=S.wiz,a=w.attrs||{};const st=wStyle();
+  const h=h2hAt(w.h2h||"none",1)||{};
+  const groups=["Modern","Ancient"];
+  return `<h3 class="wiz-h">Hand to Hand</h3>
+  <div class="row"><label class="f" style="max-width:340px"><span class="lab">Style</span><select id="w-h2h">${Object.entries(H2H).map(([k,v])=>`<option value="${k}" ${w.h2h===k?"selected":""}>${esc(v.name)}</option>`).join("")}</select></label>
+    <div class="small">At level 1: <b>${h.a||0} attacks per melee</b>${h.p?`, +${h.p} parry`:""}${h.d?`, +${h.d} dodge`:""}${h.s?`, +${h.s} strike`:""}${h.r?`, +${h.r} roll`:""}${B.ppBonus(a.PP)?`, plus +${B.ppBonus(a.PP)} strike/parry/dodge from your P.P.`:""}</div></div>
+  <p class="wiz-p small">Some classes give Hand to Hand for free; better styles usually cost Related skill picks. Check your class page.</p>
+  <h3 class="wiz-h">Weapon Proficiencies (W.P.)</h3>
+  <p class="wiz-p">A W.P. gives you strike bonuses with one type of weapon. Take one for every weapon you plan to actually use.${st?` A ${esc(st.n)} usually wants: ${esc(st.skills.filter(x=>/W\.P\./.test(x)).join("; ")||"one ranged W.P.")}.`:""}</p>
+  ${groups.map(g=>`<div class="cls-filters"><span class="lab" style="align-self:center;margin-right:4px">${g}</span>${Object.entries(WP).filter(([,v])=>v.g===g).map(([n])=>`<button class="chipf" data-act="wz-wp" data-v="${esc(n)}" aria-pressed="${w.wps.includes(n)}">${esc(n)}</button>`).join("")}</div>`).join("")}
+  ${wTip("<b>Energy Rifle</b> and <b>Energy Pistol</b> cover most guns on Rifts Earth. Add a melee W.P. (Knife, Sword) if you'll ever fight up close.")}`}
+function wGear(){const w=S.wiz;
+  return `<h3 class="wiz-h">Armor</h3>
+  <div class="row" style="max-width:640px"><label class="f" style="flex:2"><span class="lab">Armor name</span>${wIn("armor.name",w.armor.name,'placeholder="e.g. Urban Warrior armor"')}</label>
+    <label class="f" style="flex:1"><span class="lab">M.D.C. (main body)</span><input type="number" data-wk="armor.mdc" value="${+w.armor.mdc||""}"></label></div>
+  <h3 class="wiz-h">Main weapon</h3>
+  <div class="row" style="max-width:760px"><label class="f" style="flex:2"><span class="lab">Weapon</span>${wIn("weapon.name",w.weapon.name,'placeholder="e.g. Wilk\'s 447 Laser Rifle"')}</label>
+    <label class="f" style="flex:1"><span class="lab">Damage</span>${wIn("weapon.dmg",w.weapon.dmg,'placeholder="3d6"')}</label>
+    <label class="f" style="flex:1"><span class="lab">Type</span><select data-wk="weapon.type"><option value="MD" ${w.weapon.type==="MD"?"selected":""}>M.D.</option><option value="SDC" ${w.weapon.type==="SDC"?"selected":""}>S.D.C.</option></select></label>
+    <label class="f" style="flex:1.4"><span class="lab">Uses W.P.</span><select data-wk="weapon.wp"><option value="">None</option>${Object.keys(WP).map(n=>`<option ${w.weapon.wp===n?"selected":""}>${esc(n)}</option>`).join("")}</select></label></div>
+  <label class="f" style="max-width:220px;margin-top:10px"><span class="lab">Starting credits</span><input type="number" data-wk="credits" value="${+w.credits||""}"></label>
+  ${wTip("<b>Buy in this order:</b> armor, main weapon (one you have a W.P. for), sidearm, spare E-Clips, then survival gear. Your class page lists your starting equipment and money. You can add more weapons, armor and vehicles on the Gear &amp; Armor tab later.")}`}
+function wStory(){const w=S.wiz;
+  return `<h3 class="wiz-h">Alignment</h3>
+  <div class="def-opts">${W_ALIGN.map(([n,g,d])=>`<button class="def-opt wiz-pick ${w.alignment===n?"sel":""}" style="text-align:left;color:var(--ink);font:inherit;cursor:pointer" data-act="wz-set" data-k="alignment" data-v="${n}" aria-pressed="${w.alignment===n}"><span><b>${n}</b> <span class="small muted">${g}</span><br><span class="small">${esc(d)}</span></span>${w.alignment===n?'<span class="lvl easy">Chosen</span>':""}</button>`).join("")}</div>
+  <h3 class="wiz-h">Three questions</h3>
+  <div class="stack" style="gap:8px;max-width:720px">
+    <label class="f"><span class="lab">Why do you adventure?</span><textarea data-wk="why" placeholder="e.g. My town was burned by raiders and I'm hunting the ones responsible.">${esc(w.why)}</textarea></label>
+    <label class="f"><span class="lab">What do you want most?</span><textarea data-wk="want" placeholder="e.g. Enough credits to buy my family's way into a safe city.">${esc(w.want)}</textarea></label>
+    <label class="f"><span class="lab">What are you afraid of?</span><textarea data-wk="fear" placeholder="e.g. The Coalition finding out I'm a psychic.">${esc(w.fear)}</textarea></label>
+  </div>
+  ${wTip("These answers give your G.M. story hooks about <i>you</i>. A sentence each is plenty.")}`}
+function wReview(){const w=S.wiz,k=CLASSES[w.cls],a=w.attrs||{},iss=wIssues(),blocking=iss.some(x=>x[0]==="no");
+  const h=h2hAt(w.h2h||"none",1)||{};
+  return `<h3 class="wiz-h">Review</h3>
+  <div class="wiz-sum">
+    <div><span class="lab">Character</span><p><b style="font-size:20px">${esc(w.name||"Unnamed")}</b><br>${k?esc(k.n):"No class"}${w.race&&k?.k==="O.C.C."?` · ${esc(w.race)}`:""}${w.alignment?` · ${esc(w.alignment)}`:""}</p></div>
+    <div><span class="lab">Attributes</span><p class="num">${w.attrs?W_ATTR_KEYS.map(x=>`${W_ABBR[x]} ${a[x]}`).join(" · "):"Not rolled"}</p>${w.edited?.length?`<p class="small" style="color:var(--md)">Edited by hand after rolling: ${w.edited.map(x=>W_ABBR[x]).join(", ")}</p>`:""}</div>
+    <div><span class="lab">Vitals</span><p class="num">H.P. ${+w.hp||0} · S.D.C. ${+w.sdc||0}${+w.ppe?` · P.P.E. ${w.ppe}`:""}${+w.isp?` · I.S.P. ${w.isp}`:""}</p></div>
+    <div><span class="lab">Combat</span><p>${esc(H2H[w.h2h]?.name||"None")}: ${h.a||0} attacks<br>W.P.: ${w.wps.length?esc(w.wps.join(", ")):"none"}</p></div>
+    <div><span class="lab">Gear</span><p>${w.armor.name?`${esc(w.armor.name)} (${+w.armor.mdc||0} M.D.C.)`:"No armor"}<br>${w.weapon.name?`${esc(w.weapon.name)} ${esc(w.weapon.dmg||"")} ${w.weapon.type==="MD"?"M.D.":"S.D.C."}`:"No weapon"}</p></div>
+    <div><span class="lab">Skills</span><p>${w.skills.length?esc(w.skills.map(s=>s.name).join(", ")):"None"}</p></div>
+  </div>
+  ${iss.length?`<ul class="rules" style="margin-top:12px">${iss.map(([t,m,s])=>`<li class="${t}">${esc(m)} <button class="linkbtn" data-act="wz-go" data-v="${s}">Fix</button></li>`).join("")}</ul>`:`<p class="callout">Everything checks out. Ready to play.</p>`}
+  <div class="row" style="margin-top:14px"><button class="btn pri" data-act="wz-create" ${blocking?"disabled":""}>Create ${esc(w.name||"character")}</button>${blocking?`<span class="small muted">Fix the items marked ✕ first.</span>`:`<span class="small muted">You can change anything later on the character sheet.</span>`}</div>`}
+function wCreate(){const w=S.wiz,k=CLASSES[w.cls];if(!k||!w.attrs)return;
+  const c=blankChar(w.name.trim()||"New "+k.n);
+  if(k.k==="R.C.C."){c.classType="rcc";c.race=k.n;c.occ=""}
+  else if(k.k==="Race + O.C.C."){c.classType="raceocc";c.race=k.n;c.occ=k.n}
+  else {c.classType="occ";c.occ=k.n;c.race=w.race||"Human"}
+  c.player=w.player||"";c.alignment=w.alignment||"";c.attrs={...w.attrs};
+  c.hp={cur:+w.hp||0,max:+w.hp||0};c.sdc={cur:+w.sdc||0,max:+w.sdc||0};c.ppe={cur:+w.ppe||0,max:+w.ppe||0};c.isp={cur:+w.isp||0,max:+w.isp||0};
+  c.skills=w.skills.map(s=>({id:uid(),name:s.name,base:+s.base||0,per:+s.per||0,bonus:+s.bonus||0,src:s.src}));
+  c.h2h=w.h2h&&w.h2h!=="none"?w.h2h:"";c.wps=[...w.wps];c.credits=+w.credits||0;
+  if(w.armor.name||+w.armor.mdc)c.armor=[{id:uid(),name:w.armor.name||"Armor",cur:+w.armor.mdc||0,max:+w.armor.mdc||0,equipped:true,ar:0,notes:""}];
+  if(w.weapon.name)c.weapons=[{id:uid(),name:w.weapon.name,dmg:w.weapon.dmg||"1d6",type:w.weapon.type||"MD",range:"",shots:0,shotsMax:0,clips:0,strike:0,notes:"",wp:w.weapon.wp||""}];
+  const st=wStyle();
+  c.notes=[`Built with the guided builder${w.method?` (attributes: ${w.method}${w.edited?.length?`; edited by hand after rolling: ${w.edited.map(x=>W_ABBR[x]).join(", ")}`:""})`:""}. Class details: Rifts Ultimate Edition, around p. ${k.p}.`,
+    st?`Play style: ${st.n}.`:"",w.why?`Why I adventure: ${w.why}`:"",w.want?`What I want: ${w.want}`:"",w.fear?`What I fear: ${w.fear}`:""].filter(Boolean).join("\n");
+  S.wiz=null;try{localStorage.removeItem("rft.wiz")}catch(e){}
+  S.picker=false;S.tab="sheet";addChar(c)}
+function wAct(a,b,i){const w=S.wiz;
+  switch(a){
+    case"wz-start":S.wiz=wLoad()||wNew();S.tab="build";S.picker=false;wSave();renderMain();window.scrollTo({top:0});return true;
+    case"wz-exit":S.wiz=null;renderMain();return true;
+    case"wz-reset":S.wiz=wNew();wSave();renderMain();return true;
+  }
+  if(!w)return false;
+  switch(a){
+    case"wz-go":w.step=Math.max(0,Math.min(W_STEPS.length-1,+b.dataset.v));wSave();renderMain();document.querySelector(".wiz")?.scrollIntoView({block:"start"});return true;
+    case"wz-set":w[b.dataset.k]=b.dataset.v;wSave();renderMain();return true;
+    case"wz-roll":w.edited=[];wRollAll();return true;
+    case"wz-cls":{if(wReq(CLASSES[i]).fails.length){showStatus(`You don't meet the ${CLASSES[i].n} requirements: ${wReq(CLASSES[i]).fails.join(", ")}.`);return true}
+      w.cls=w.cls===i?null:i;wSave();renderMain();return true}
+    case"wz-hp":{const d=1+Math.floor(Math.random()*6),pe=+w.attrs?.PE||0;w.hp=pe+d;w.hpRoll=`P.E. ${pe} + 1D6 (${d}) = ${w.hp}`;
+      try{logRoll({char:w.name||"",label:"Hit Points (P.E. + 1D6)",detail:w.hpRoll,total:w.hp,flag:"",cls:""})}catch(e){}wSave();renderMain();return true}
+    case"wz-sk":{const r=SKILL_LIB[i];if(r&&!w.skills.some(s=>s.name===r[1]))w.skills.push({name:r[1],cat:r[0],base:r[2]??0,per:r[3]??0,bonus:0,src:b.dataset.v});wSave();renderMain();return true}
+    case"wz-sk-rm":w.skills.splice(i,1);wSave();renderMain();return true;
+    case"wz-wp":{const n=b.dataset.v;w.wps=w.wps.includes(n)?w.wps.filter(x=>x!==n):[...w.wps,n];wSave();renderMain();return true}
+    case"wz-create":wCreate();return true;
+  }
+  return false}
+function wField(t){const w=S.wiz;if(!w)return;const k=t.dataset.wk;
+  let v=t.type==="number"?(t.value===""?0:+t.value):t.value;
+  setPath(w,k,v);
+  if(k.startsWith("attrs.")){const a=k.slice(6);if(!w.method)w.method="entered by hand";
+    else if(w.rolls&&w.rolls[a]&&w.rolls[a].t!==v){delete w.rolls[a];w.edited=[...new Set([...(w.edited||[]),a])]}}
+  wSave();
+  if(t.tagName==="SELECT"||k.startsWith("attrs.")||k.startsWith("skills."))renderMainSoftWiz(t)}
+function renderMainSoftWiz(t){const id=t.dataset.wk;renderMain();const n=document.querySelector(`[data-wk="${CSS.escape(id)}"]`);if(n&&t.tagName!=="SELECT"){n.focus();try{const L=String(n.value).length;n.setSelectionRange?.(L,L)}catch(e){}}}
+document.addEventListener("input",e=>{const t=e.target;
+  if(t.dataset?.wk){e.stopPropagation();if(t.tagName!=="SELECT")wField(t);return}
+  if(t.id==="w-q"&&S.wiz){e.stopPropagation();S.wiz.q=t.value;wSave();renderMain();const n=document.getElementById("w-q");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}
+},true);
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.dataset?.wk){e.stopPropagation();if(t.tagName==="SELECT"||t.type==="number")wField(t);return}
+  if(t.id==="w-cat"&&S.wiz){e.stopPropagation();S.wiz.cat=t.value;wSave();renderMain();return}
+  if(t.id==="w-h2h"&&S.wiz){e.stopPropagation();S.wiz.h2h=t.value;wSave();renderMain();return}
+},true);
 
 /* ---------- welcome: what is Rifts? ---------- */
 const POWERS=[
@@ -1564,7 +1821,7 @@ function pickerView(){
     <section class="panel starter-head">
       <div><h2 style="color:var(--ink);font-size:22px">${has?"Add a character":"Welcome to the table"}</h2>
       <p>Pick a ready-made starter to play right away, or start a blank sheet if you're building from the book. ${has?"":"Everyone at the table sees the same sheets and dice log."}</p></div>
-      <div class="row"><button class="btn" data-act="tab" data-v="welcome">What is Rifts?</button><button class="btn" data-act="tab" data-v="build">How to build a character</button><button class="btn" data-act="tab" data-v="guide">New to role-playing? Read the guide</button>${has?`<button class="btn ghost" data-act="picker-close">Back</button>`:""}</div>
+      <div class="row"><button class="btn" data-act="tab" data-v="welcome">What is Rifts?</button><button class="btn pri" data-act="wz-start">Guided builder</button><button class="btn" data-act="tab" data-v="build">How to build a character</button><button class="btn" data-act="tab" data-v="guide">New to role-playing? Read the guide</button>${has?`<button class="btn ghost" data-act="picker-close">Back</button>`:""}</div>
     </section>
     <div class="starters">${STARTERS.map(s=>{const a=s.data.attrs;
       return `<article class="starter"><div class="st-top"><span class="role">${esc(s.role)}</span><h3>${esc(s.title)}</h3><span class="small muted">${esc(s.data.name)}${s.data.classType==="raceocc"?" · "+esc(s.data.race)+" race":""}</span></div>
@@ -1858,7 +2115,7 @@ function renderMain(){
       <button class="tab" role="tab" data-act="tab" data-v="classes" aria-selected="${tab==="classes"}">Classes</button>
       <button class="tab" role="tab" data-act="tab" data-v="guide" aria-selected="${tab==="guide"}">Guide &amp; Rules</button>
     </div>`+(S.ro&&["sheet","gear"].includes(tab)?`<div class="ro-banner">You're viewing <b>${esc(c.name)}</b>, ${esc(ownerName(S.sel))}'s character. You can roll for them, but only they or the G.M. can make changes.</div>`:"")
-    +(picking?pickerView():tab==="welcome"?welcomeView():tab==="mine"?mineView():tab==="campaign"?campaignView():tab==="combat"?combatView():tab==="classes"?`<section class="panel"><div class="sec-head"><h2 style="color:var(--ink);font-size:22px">Classes</h2><span class="small muted">Every O.C.C. and R.C.C. in the Rifts Ultimate Edition</span></div><p style="margin:0 0 10px;max-width:68ch">Pick the kind of character you want to be. Each card says who they are in the world of Rifts, how hard they are to play, and what the book requires. Six classes have a ready-to-play starter.</p>${classesView()}</section>`:tab==="build"?buildView():tab==="guide"?guideView(c):tab==="gear"?gearView(c):tab==="library"?libraryView(c):sheetView(c));
+    +(picking?pickerView():tab==="welcome"?welcomeView():tab==="mine"?mineView():tab==="campaign"?campaignView():tab==="combat"?combatView():tab==="classes"?`<section class="panel"><div class="sec-head"><h2 style="color:var(--ink);font-size:22px">Classes</h2><span class="small muted">Every O.C.C. and R.C.C. in the Rifts Ultimate Edition</span></div><p style="margin:0 0 10px;max-width:68ch">Pick the kind of character you want to be. Each card says who they are in the world of Rifts, how hard they are to play, and what the book requires. Six classes have a ready-to-play starter.</p>${classesView()}</section>`:tab==="build"?(S.wiz?wizardView():buildView()):tab==="guide"?guideView(c):tab==="gear"?gearView(c):tab==="library"?libraryView(c):sheetView(c));
   if(S.ro&&["sheet","gear"].includes(tab)) el.querySelectorAll('select[data-k],textarea[data-k],input[type=checkbox],#dmg-amt,#dmg-strike').forEach(x=>x.disabled=true);
   if(actId){const n=document.getElementById(actId);if(n){n.focus();try{if(selS!=null)n.setSelectionRange(selS,selE)}catch(e){}}}
 }
@@ -2274,6 +2531,7 @@ document.addEventListener("submit",e=>{
 document.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]"); if(!b||b.type==="checkbox") return;
   const a=b.dataset.act, c=cur(), i=+b.dataset.i;
+  if(a.startsWith("wz-")&&wAct(a,b,i)) return;
   if(S.ro&&RO_ACTS.has(a)){showStatus(`${c?.name||"This character"} belongs to ${ownerName(S.sel)}. Only they or the G.M. can change it.`);return}
   if(/^(rule-|cb-|npc-|j-(save|edit|del|done|cancel)|camp-save|secret-)/.test(a)&&!isGM()){showStatus("Only this campaign's G.M. can do that.");return}
   switch(a){
