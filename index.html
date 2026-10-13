@@ -350,6 +350,7 @@ input.camp-title{border:1px dashed var(--line);background:transparent;padding:2p
 .veh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
 .veh h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 .locs td.n,.vw td.n{width:72px}
+@media (max-width:640px){.b-attrs .b-who{display:none}}
 /* welcome */
 .w-hero{position:relative;overflow:hidden;min-height:260px;display:flex;align-items:center;padding:28px 24px}
 .w-lines{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
@@ -1343,6 +1344,142 @@ function renderRoster(){
   document.getElementById("dock").classList.toggle("hide-m",S.mview!=="dice");
 }
 
+/* ---------- create a character: level 1 build guide ---------- */
+const B_ATTRS=[
+ ["IQ","I.Q.","Intelligence","Adds a bonus to every skill % once it's 16 or higher. Skills are how you solve problems outside a fight, so smart characters succeed more often.","Skill-heavy classes, mages, anyone who wants to be good at many things"],
+ ["ME","M.E.","Mental Endurance","Saves against psionic attacks and insanity. Psychics use it to build their I.S.P. (psychic energy).","Psychics most of all; useful for everyone in a world full of mind powers"],
+ ["MA","M.A.","Mental Affinity","How much people trust you or are intimidated by you. High M.A. gives a trust/intimidate %.","Talkers, leaders, Vagabonds, City Rats, Rogue Scholars"],
+ ["PS","P.S.","Physical Strength","Bonus damage with punches, kicks and melee weapons at 16+, plus how much you can carry and lift.","Melee fighters, Juicers, Crazies, Cyber-Knights"],
+ ["PP","P.P.","Physical Prowess","Dexterity and reflexes. At 16+ it adds to strike, parry and dodge, the three rolls that decide most fights.","Every fighter. It's the most important combat stat in the game"],
+ ["PE","P.E.","Physical Endurance","Your H.P. starts at P.E. + 1D6. It also helps saves against magic, poison and coma, and mages add it to their P.P.E.","Everyone (it keeps you alive), especially mages"],
+ ["PB","P.B.","Physical Beauty","How attractive or striking you are. High P.B. gives a charm/impress %.","Talkers and faces of the group; least important for combat"],
+ ["Spd","Spd","Speed","How far you can run each melee round. Matters for chases, closing distance and escaping.","Scouts, melee fighters, anyone without a vehicle"],
+];
+const B_STYLES=[
+ {id:"soldier",n:"Soldier / Gunfighter",tag:"Easy",lv:"easy",
+  d:"You fight with guns and armor. Point, shoot, take cover. The simplest way to play Rifts and a great first character.",
+  cls:["Merc Soldier","Headhunter","Combat Cyborg","Glitter Boy","Robot Pilot","Coalition Grunt"],starter:"merc",
+  stats:[["PP","Hits more often and dodges better"],["PE","More H.P. and better saves"],["PS","Carries heavy gear"]],
+  skills:["W.P. Energy Rifle and W.P. Energy Pistol (bonus to strike with the guns you'll actually use)","Hand to Hand: Expert or better if you can afford it","Radio: Basic and a Pilot skill so you're useful between fights","First Aid or Paramedic if no one else heals"],
+  gear:"The best M.D.C. armor you can afford, an energy rifle, a sidearm and spare E-Clips. Armor first: in Rifts your armor is your real life bar.",
+  why:"Mega-Damage weapons kill unarmored people in one hit, so a soldier's job is to soak hits in armor and remove threats fast. P.P. is king because every strike, parry and dodge uses it.",
+  trap:"Ignoring I.Q. entirely. Low skills make you useless when the party isn't fighting, which is most of the game."},
+ {id:"melee",n:"Melee Champion",tag:"Medium",lv:"mid",
+  d:"You close the distance and fight up close with blades, fists or a Psi-Sword. Fast, strong and dramatic.",
+  cls:["Cyber-Knight","Juicer","Crazy"],starter:"ck",
+  stats:[["PP","Strike, parry and dodge"],["PS","Melee damage bonus"],["Spd","Gets you into range"],["PE","Survive the hits you take getting there"]],
+  skills:["Hand to Hand: Martial Arts or Commando if available (more attacks and better bonuses)","W.P. Sword, Knife or Blunt for your main weapon","Gymnastics, Acrobatics or Boxing (extra S.D.C., attacks or rolls)","One ranged W.P. so you're not helpless against flyers"],
+  gear:"A Vibro-Blade or other Mega-Damage melee weapon, the best armor your class allows, and a backup gun.",
+  why:"Up close you can parry (you can't parry gunfire), so a melee build lives on high P.P. and lots of attacks per melee. Strength turns those hits into damage.",
+  trap:"Running across open ground into gunfire. Use cover, let the soldiers suppress, then charge. Juicers and Crazies also have built-in drawbacks, so read them with your G.M."},
+ {id:"mage",n:"Spellcaster",tag:"Medium",lv:"mid",
+  d:"You cast spells using P.P.E. (magic energy), drawn from yourself and from ley lines. Flexible, powerful, and fragile if you're careless.",
+  cls:["Ley Line Walker","Mystic","Techno-Wizard","Shifter","Elemental Fusionist","Ley Line Rifter"],starter:"llw",
+  stats:[["PE","Adds to your P.P.E. pool and your saves"],["IQ","Better skill %"],["ME","Resists mind attacks"]],
+  skills:["Lore skills (Demons & Monsters, Magic) so you know what you're facing","Language and Literacy","Wilderness Survival or Land Navigation","One W.P. (a pistol) for when your P.P.E. runs out"],
+  gear:"Light M.D.C. armor or a protective spell, a pistol, and anything that stores or saves P.P.E.",
+  why:"Your spell list is your toolbox: damage, protection, travel, healing. Spells cost P.P.E., which comes back slowly, so pick a mix of cheap everyday spells and a few big ones.",
+  trap:"Spending all your P.P.E. in the first fight. Track it, open with cheap spells, and fight near ley lines when you can (spells get stronger there)."},
+ {id:"psychic",n:"Psychic",tag:"Medium",lv:"mid",
+  d:"Your mind is your weapon: sensing, healing, moving objects, attacking minds. Psychics feel very different from anyone else at the table.",
+  cls:["Mind Melter","Burster","Psi-Stalker","Dog Boy"],starter:"mm",
+  stats:[["ME","Your I.S.P. pool and your save vs other psychics"],["PP","Survive combat"],["IQ","Better skills"]],
+  skills:["Skills that cover what your powers don't, often Pilot, Lore or a W.P.","Hand to Hand: Basic at least","Psi-Stalkers and Dog Boys: Tracking, Prowl and wilderness skills"],
+  gear:"M.D.C. armor (Bursters and Mind Melters are squishy), a reliable energy pistol, and a way to sense danger.",
+  why:"Powers cost I.S.P. (psychic energy) and it doesn't refill fast, so choose powers that solve problems: sensing, healing and one strong attack beat a pile of tricks.",
+  trap:"Using flashy powers on easy fights and having nothing left for the boss. Also remember many places, like Coalition cities, treat psychics as criminals."},
+ {id:"skills",n:"Problem Solver / Face",tag:"Easy",lv:"easy",
+  d:"You talk, fix, heal, hack or know things. The group's fixer for every problem that isn't a gunfight.",
+  cls:["Vagabond","City Rat","Operator","Body Fixer","Cyber-Doc","Rogue Scholar","Rogue Scientist"],starter:"vag",
+  stats:[["IQ","Every skill gets better"],["MA","People trust you"],["PB","Charm and impress"],["PP","Stay alive in fights"]],
+  skills:["Your class's specialty: medicine, mechanics, computers, streetwise or lore","Barter, Find Contraband or Streetwise (money and information)","Pilot: Hovercycle or Truck (someone has to drive)","W.P. Energy Pistol and Hand to Hand: Basic"],
+  gear:"Tools for your specialty, solid armor, a pistol, and money. You'll often be the one buying and selling.",
+  why:"Most of a Rifts session isn't combat: getting into towns, finding jobs, fixing the vehicle, keeping people alive. You turn obstacles into progress.",
+  trap:"Thinking you can't contribute in a fight. Take cover, heal, repair, call targets, and shoot when it's safe. Never walk into a fight without armor."},
+ {id:"scout",n:"Scout / Hunter",tag:"Easy",lv:"easy",
+  d:"You find the trail, spot the ambush and get the group across monster country alive.",
+  cls:["Wilderness Scout","Psi-Stalker","Dog Boy","Headhunter"],starter:"ps",
+  stats:[["PP","First shot and dodges"],["Spd","Scouting ahead and getting back"],["IQ","Tracking and survival %"]],
+  skills:["Tracking, Land Navigation and Wilderness Survival","Prowl and Detect Ambush","Horsemanship or a Pilot skill","W.P. Energy Rifle (you'll often shoot first, from far away)"],
+  gear:"A long-range rifle, light armor so you can move quietly, and binoculars or optics.",
+  why:"Rifts Earth is mostly wilderness between a few towns. Knowing what's coming means your group chooses the fight instead of being ambushed.",
+  trap:"Scouting so far ahead that you fight alone. Find, report, fall back."},
+];
+const B_STEPS=[
+ ["Talk to your G.M.","Ask what kind of campaign it is (military, wilderness, city, monster-hunting), which books are allowed and whether any classes are off-limits.","A Coalition Grunt and a Shifter in the same party can work, but only if everyone knows going in."],
+ ["Pick a play style","Choose how you want to spend a session: shooting, fighting up close, casting, psychic powers, solving problems or scouting. The cards below explain each.","This decides which attributes, skills and gear matter, so every later choice gets easier."],
+ ["Roll attributes","Roll 3D6 for each of the 8 attributes, in order. A roll of 16, 17 or 18 is exceptional: roll another 1D6 and add it (if that's a 6, roll and add once more). Use the roller below. Some G.M.s let you arrange the rolls; ask first.","Bonuses start at 16, and very low scores (7 or less) carry penalties. The sheet works both out for you."],
+ ["Choose race and class","Most first characters are human with an O.C.C. (Occupational Character Class). An R.C.C. (Racial Character Class), like a Psi-Stalker or Dragon Hatchling, is your race and your job in one. Check the requirements on the Classes tab.","If your rolls don't meet a class's minimums, you can't take it. Pick the class after rolling, not before."],
+ ["Write down H.P., S.D.C. and energy","H.P. = your P.E. score + 1D6. S.D.C. comes from your class and physical skills. Mages get P.P.E. and psychics get I.S.P. from their class description.","H.P. and S.D.C. matter when you're out of armor. In Mega-Damage fights, your armor's M.D.C. is what keeps you alive."],
+ ["Pick skills","Your class gives you O.C.C. skills automatically. Then choose O.C.C. Related skills (they get your class bonus) and Secondary skills (base % only). The Skill Library tab shows each skill's % at your level.","Cover the party's gaps. If nobody can drive, heal or read, those are the best picks you can make."],
+ ["Set Hand to Hand and W.P.s","In the Training box on your Character tab, pick your Hand to Hand style and Weapon Proficiencies. The app adds attacks per melee and strike, parry and dodge bonuses for you.","Attacks per melee is how many things you can do each round. W.P.s are bonuses to hit with the weapons you'll actually use."],
+ ["Gear up","Use your class's starting equipment and credits. Buy in this order: armor, main weapon (one you have a W.P. for), sidearm, spare E-Clips, survival gear. Enter armor on the Gear & Armor tab.","Armor is your life bar against Mega-Damage. A great gun with no armor means you die before using it."],
+ ["Alignment and background","Pick an alignment (Scrupulous or Unprincipled are easy for new players) and answer three questions: Why do you adventure? What do you want? What are you afraid of?","These give the G.M. hooks for stories about you, and give you something to roleplay besides combat."],
+ ["Final check","Can you say how many attacks you have, your best strike bonus, your armor's M.D.C., what you do in a fight and what you do outside one? Then you're ready.","Knowing these five things keeps your turns fast and fun at the table."],
+];
+function bRoll(){const d=()=>1+Math.floor(Math.random()*6);
+  const out={},det=[];for(const [k,l] of B_ATTRS){let r=[d(),d(),d()],t=r[0]+r[1]+r[2],x="";
+    if(t>=16){let e=d();t+=e;x="+"+e;if(e===6){const e2=d();t+=e2;x+="+"+e2}}
+    out[k]=t;det.push(`${l} ${r.join("+")}${x}=${t}`)}
+  S.bRolled=out;
+  try{logRoll({char:"",label:"Attributes (3D6 each)",detail:det.join(" · "),total:Object.values(out).reduce((a,b)=>a+b,0),flag:"",cls:""})}catch(e){}
+  renderMain()}
+function bUse(){const r=S.bRolled;if(!r)return;const c=blankChar("New character");c.attrs={...r};
+  const hp=r.PE+1+Math.floor(Math.random()*6);c.hp={cur:hp,max:hp};
+  c.notes=`Rolled with the Create a Character guide. H.P. = P.E. (${r.PE}) + 1D6 = ${hp}.\nNext: pick your race and class, then skills, Hand to Hand, W.P.s and gear.`;
+  S.picker=false;S.tab="sheet";addChar(c)}
+function buildView(){
+  const st=B_STYLES.find(s=>s.id===S.bStyle)||null, r=S.bRolled;
+  const lab=k=>B_ATTRS.find(a=>a[0]===k)[1];
+  const fit=(s)=>!r?"":s.stats.map(([k])=>r[k]).reduce((a,b)=>a+b,0)/s.stats.length;
+  const best=r?[...B_STYLES].sort((a,b)=>fit(b)-fit(a))[0]:null;
+  return `<div class="stack">
+  <section class="panel gsec"><h2>Create a character</h2>
+    <p class="w-p" style="margin-top:0">A step-by-step path to a level 1 character, with the reason behind each choice. If you want to start playing tonight, a <button class="linkbtn" data-act="picker">ready-made starter</button> is faster. Use this guide when you want to build your own.</p>
+    <ol class="steps big">${B_STEPS.map(([t,h,w],i)=>`<li><b>${esc(t)}${t.endsWith(".")?"":"."}</b> ${esc(h)}<div class="small muted" style="margin-top:2px"><span class="lab" style="color:var(--accent)">Why</span> ${esc(w)}</div>${i===2?bRollerView():""}</li>`).join("")}</ol>
+  </section>
+  <section class="panel gsec"><h2>What each attribute does</h2>
+    <div class="tbl"><table class="mods b-attrs"><thead><tr><th>Attribute</th><th>What it does</th><th class="b-who">Who needs it most</th>${r?"<th>You rolled</th>":""}</tr></thead><tbody>
+    ${B_ATTRS.map(([k,l,n,w,who])=>`<tr><td><b>${l}</b><br><span class="small muted">${n}</span></td><td>${esc(w)}</td><td class="small b-who">${esc(who)}</td>${r?`<td class="num" style="font-size:18px;${r[k]>=16?"color:var(--good)":r[k]<=7?"color:var(--bad)":""}">${r[k]}</td>`:""}</tr>`).join("")}
+    </tbody></table></div>
+    <p class="callout">Rule of thumb: <b>P.P. and P.E. help every character.</b> After that, raise what your play style uses and don't worry about the rest.</p>
+  </section>
+  <section class="panel gsec"><h2>Pick a play style</h2>
+    <p style="margin:0 0 8px">Tap one to see which classes fit, what to prioritize and the mistakes new players make.${best?` Based on your rolls, <b>${esc(best.n)}</b> looks like a strong fit.`:""}</p>
+    <div class="cls-filters">${B_STYLES.map(s=>`<button class="chipf" data-act="b-style" data-v="${s.id}" aria-pressed="${st?.id===s.id}">${esc(s.n)}${best?.id===s.id?" ★":""}</button>`).join("")}</div>
+    ${st?bStyleCard(st,r,lab):`<div class="cls-grid">${B_STYLES.map(s=>`<button class="cls" style="text-align:left;cursor:pointer;color:var(--ink);font:inherit" data-act="b-style" data-v="${s.id}"><div class="cls-top"><h4>${esc(s.n)}</h4></div><span class="lvl ${s.lv}">${s.tag}</span><p>${esc(s.d)}</p><p class="small muted">Key stats: ${s.stats.map(x=>lab(x[0])).join(", ")}</p></button>`).join("")}</div>`}
+  </section>
+  <section class="panel gsec"><h2>Common first-character mistakes</h2>
+    <ul class="rules">
+      <li class="no"><b>No armor.</b> One Mega-Damage hit can kill an unarmored person outright. Everyone wears M.D.C. armor unless their class says otherwise.</li>
+      <li class="no"><b>Weapons without the W.P.</b> You can fire any gun, but without the matching W.P. you get none of your strike bonuses with it.</li>
+      <li class="no"><b>All combat, no skills.</b> Most of a session is travel, talking and problem solving. Take at least two skills that help outside a fight.</li>
+      <li class="warn"><b>Picking the most powerful class.</b> Dragons, Glitter Boys and Shifters are fun but complicated. A simpler class lets you learn the rules first.</li>
+      <li class="ok"><b>Ask the table.</b> Find out what the others are playing and fill a gap: healer, driver, scout or talker.</li>
+    </ul>
+  </section>
+  </div>`;
+}
+function bRollerView(){const r=S.bRolled;
+  return `<div class="training" style="margin-top:8px"><div class="tr-row"><button class="btn pri sm" data-act="b-roll">${r?"Roll again":"Roll my attributes"}</button>
+    ${r?`<button class="btn sm" data-act="b-use">Start a sheet with these</button>`:""}<span class="small muted">Rolls show in the dice log so the table can see them.</span></div>
+    ${r?`<div class="st-stats num" style="font-size:14px;gap:6px 16px">${B_ATTRS.map(([k,l])=>`<span><b style="color:${r[k]>=16?"var(--good)":r[k]<=7?"var(--bad)":"var(--ink)"}">${l} ${r[k]}</b></span>`).join("")}</div>`:""}</div>`}
+function bStyleCard(s,r,lab){
+  const idx=c=>CLASSES.findIndex(k=>k.n===c);
+  return `<article class="howto panel" style="margin-top:4px"><div class="sec-head"><div><span class="role">${s.tag} to play</span><h3 style="font-size:22px">${esc(s.n)}</h3></div>
+      <div class="row">${s.starter?`<button class="btn pri sm" data-act="clone" data-v="${s.starter}">Try the starter</button>`:""}<button class="btn sm ghost" data-act="b-style" data-v="">All play styles</button></div></div>
+    <p style="margin:0 0 10px;max-width:70ch">${esc(s.d)}</p>
+    <div class="howto-grid">
+      <div><h3>Classes that fit</h3><ul>${s.cls.map(c=>{const i=idx(c),k=CLASSES[i];return `<li>${i>=0?`<button class="linkbtn" data-act="class-blank" data-i="${i}" title="Start a blank ${esc(c)} sheet">${esc(c)}</button>`:esc(c)}${k?` <span class="small muted">· ${k.lvl===1?"easy":k.lvl===2?"medium":"hard"}${k.req&&k.req!=="None"?" · needs "+esc(k.req):""}</span>`:""}</li>`}).join("")}</ul><p class="small muted" style="margin-top:6px">Click a class to start a blank sheet for it.</p></div>
+      <div><h3>Attributes to prioritize</h3><ol>${s.stats.map(([k,w])=>`<li><b>${lab(k)}</b>: ${esc(w)}${r?` <span class="num ${r[k]>=16?"pos":""}" style="color:${r[k]>=16?"var(--good)":r[k]<=7?"var(--bad)":"var(--muted)"}">(you: ${r[k]})</span>`:""}</li>`).join("")}</ol></div>
+      <div><h3>Skills worth taking</h3><ul>${s.skills.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div><h3>Gear</h3><p class="small" style="margin:0">${esc(s.gear)}</p></div>
+    </div>
+    <p class="callout"><b>Why it works:</b> ${esc(s.why)}</p>
+    <p class="callout no"><b>Beginner trap:</b> ${esc(s.trap)}</p>
+  </article>`;
+}
+
 /* ---------- welcome: what is Rifts? ---------- */
 const POWERS=[
  ["Coalition States","Human empire","A fortress empire built around the walled mega-city of Chi-Town. High-tech, militarized and convinced that magic, D-Bees and anything inhuman must be wiped out. Its black, skull-faced soldiers are the most feared army on the continent."],
@@ -1427,7 +1564,7 @@ function pickerView(){
     <section class="panel starter-head">
       <div><h2 style="color:var(--ink);font-size:22px">${has?"Add a character":"Welcome to the table"}</h2>
       <p>Pick a ready-made starter to play right away, or start a blank sheet if you're building from the book. ${has?"":"Everyone at the table sees the same sheets and dice log."}</p></div>
-      <div class="row"><button class="btn" data-act="tab" data-v="welcome">What is Rifts?</button><button class="btn" data-act="tab" data-v="guide">New to role-playing? Read the guide</button>${has?`<button class="btn ghost" data-act="picker-close">Back</button>`:""}</div>
+      <div class="row"><button class="btn" data-act="tab" data-v="welcome">What is Rifts?</button><button class="btn" data-act="tab" data-v="build">How to build a character</button><button class="btn" data-act="tab" data-v="guide">New to role-playing? Read the guide</button>${has?`<button class="btn ghost" data-act="picker-close">Back</button>`:""}</div>
     </section>
     <div class="starters">${STARTERS.map(s=>{const a=s.data.attrs;
       return `<article class="starter"><div class="st-top"><span class="role">${esc(s.role)}</span><h3>${esc(s.title)}</h3><span class="small muted">${esc(s.data.name)}${s.data.classType==="raceocc"?" · "+esc(s.data.race)+" race":""}</span></div>
@@ -1542,7 +1679,7 @@ function guideView(c){
       <li><b>Percentile (d100) rolls</b> for skills like Climbing or Barter. Roll 1-100 and get <b>equal to or under</b> your skill %. <b>Lower is better.</b></li></ul>
     <p>Nobody "wins." The goal is a good story. Talk in character, ask the G.M. questions, and work with the other players.</p>
     <h3>Your first session</h3>
-    <ol class="steps"><li>Pick a starter character, or browse the <button class="linkbtn" data-act="tab" data-v="classes">Classes</button> tab and let your G.M. help you build one.</li><li>Read your "How to play" card at the top of your sheet.</li><li>Find your <b>attacks per melee</b>, your best weapon and your armor's M.D.C.</li><li>When the G.M. says "roll initiative," press Roll on Initiative. The app does the math and shows everyone the result.</li><li>When unsure, describe what you want to do. The G.M. will tell you what to roll.</li></ol>
+    <ol class="steps"><li>Pick a starter character, or follow the <button class="linkbtn" data-act="tab" data-v="build">Create a Character</button> guide to build your own.</li><li>Read your "How to play" card at the top of your sheet.</li><li>Find your <b>attacks per melee</b>, your best weapon and your armor's M.D.C.</li><li>When the G.M. says "roll initiative," press Roll on Initiative. The app does the math and shows everyone the result.</li><li>When unsure, describe what you want to do. The G.M. will tell you what to roll.</li></ol>
   </section>
   <section class="panel gsec" id="g-house"><h2>House rules</h2>${houseView()}</section>
   <section class="panel gsec" id="g-turn"><h2>Combat step by step</h2>
@@ -1705,7 +1842,7 @@ function renderMain(){
   const act=document.activeElement, actId=act?.id, selS=act?.selectionStart, selE=act?.selectionEnd;
   const c=cur();
   S.ro=!!c&&!canEdit(S.sel);
-  const picking=S.picker||(!c&&!["guide","classes","mine","campaign","combat","welcome"].includes(S.tab));
+  const picking=S.picker||(!c&&!["guide","classes","mine","campaign","combat","welcome","build"].includes(S.tab));
   const tab=picking?"":S.tab;
   const acct=!S.local&&!!S.me;
   el.innerHTML=`<div class="tabs" role="tablist">
@@ -1717,10 +1854,11 @@ function renderMain(){
       :`<button class="tab" role="tab" data-act="picker" aria-selected="${picking}">Start</button>`}
       ${!S.local?`<button class="tab" role="tab" data-act="tab" data-v="campaign" aria-selected="${tab==="campaign"}">Campaign</button>
       <button class="tab" role="tab" data-act="tab" data-v="combat" aria-selected="${tab==="combat"}">Combat${S.combat?.list?.length?` <span class="dot" aria-label="fight in progress"></span>`:""}</button>`:""}
+      <button class="tab" role="tab" data-act="tab" data-v="build" aria-selected="${tab==="build"}">Create a Character</button>
       <button class="tab" role="tab" data-act="tab" data-v="classes" aria-selected="${tab==="classes"}">Classes</button>
       <button class="tab" role="tab" data-act="tab" data-v="guide" aria-selected="${tab==="guide"}">Guide &amp; Rules</button>
     </div>`+(S.ro&&["sheet","gear"].includes(tab)?`<div class="ro-banner">You're viewing <b>${esc(c.name)}</b>, ${esc(ownerName(S.sel))}'s character. You can roll for them, but only they or the G.M. can make changes.</div>`:"")
-    +(picking?pickerView():tab==="welcome"?welcomeView():tab==="mine"?mineView():tab==="campaign"?campaignView():tab==="combat"?combatView():tab==="classes"?`<section class="panel"><div class="sec-head"><h2 style="color:var(--ink);font-size:22px">Classes</h2><span class="small muted">Every O.C.C. and R.C.C. in the Rifts Ultimate Edition</span></div><p style="margin:0 0 10px;max-width:68ch">Pick the kind of character you want to be. Each card says who they are in the world of Rifts, how hard they are to play, and what the book requires. Six classes have a ready-to-play starter.</p>${classesView()}</section>`:tab==="guide"?guideView(c):tab==="gear"?gearView(c):tab==="library"?libraryView(c):sheetView(c));
+    +(picking?pickerView():tab==="welcome"?welcomeView():tab==="mine"?mineView():tab==="campaign"?campaignView():tab==="combat"?combatView():tab==="classes"?`<section class="panel"><div class="sec-head"><h2 style="color:var(--ink);font-size:22px">Classes</h2><span class="small muted">Every O.C.C. and R.C.C. in the Rifts Ultimate Edition</span></div><p style="margin:0 0 10px;max-width:68ch">Pick the kind of character you want to be. Each card says who they are in the world of Rifts, how hard they are to play, and what the book requires. Six classes have a ready-to-play starter.</p>${classesView()}</section>`:tab==="build"?buildView():tab==="guide"?guideView(c):tab==="gear"?gearView(c):tab==="library"?libraryView(c):sheetView(c));
   if(S.ro&&["sheet","gear"].includes(tab)) el.querySelectorAll('select[data-k],textarea[data-k],input[type=checkbox],#dmg-amt,#dmg-strike').forEach(x=>x.disabled=true);
   if(actId){const n=document.getElementById(actId);if(n){n.focus();try{if(selS!=null)n.setSelectionRange(selS,selE)}catch(e){}}}
 }
@@ -2156,6 +2294,9 @@ document.addEventListener("click",e=>{
     case"skin":applySkin(b.dataset.v);break;
     case"w-hide":try{localStorage.setItem("rft.seenWelcome","1")}catch(e){}S.tab=cur()?"sheet":"mine";S.picker=!cur()&&!S.me;remember();renderMain();break;
     case"class-blank":blankFromClass(i);break;
+    case"b-style":S.bStyle=b.dataset.v||null;renderMain();break;
+    case"b-roll":bRoll();break;
+    case"b-use":bUse();break;
     case"cls-group":S.clsGroup=b.dataset.v;renderMain();break;
     case"cls-easy":S.clsEasy=!S.clsEasy;renderMain();break;
     case"guide":{e.preventDefault();S.picker=false;S.tab="guide";S.mview="sheet";remember();renderRoster();renderMain();
